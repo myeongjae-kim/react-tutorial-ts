@@ -53,8 +53,26 @@ const Game: React.FC = () => {
   }])
   const [xIsNext, setXIsNext] = React.useState(true);
 
-  const current = history[history.length - 1];
+  const [stepNumber, setStepNumber] = React.useState(0);
+  const jumpTo = React.useCallback((step: number) => {
+    setStepNumber(step)
+    setXIsNext(step % 2 === 0);
+  }, []);
+
+  const current = history[stepNumber];
   const winner = calculateWinner(current.squares);
+
+  const moves = history.map((step, move) => {
+    const desc = move ?
+      'Go to move #' + move :
+      'Go to game start';
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    );
+  });
+
   const [status, setStatus] = React.useState<undefined | string>();
   React.useEffect(() => {
     if (winner) {
@@ -65,14 +83,16 @@ const Game: React.FC = () => {
   }, [winner, xIsNext]);
 
   const handleClick = React.useCallback((i: number) => {
+    const newHistory = history.slice(0, stepNumber + 1);
     const squares = current.squares.slice();
     if (winner || squares[i]) {
       return;
     }
     squares[i] = xIsNext ? 'X' : 'O';
-    setHistory(history.concat([{ squares }]))
+    setHistory(newHistory.concat([{ squares }]))
     setXIsNext(!xIsNext);
-  }, [current.squares, history, winner, xIsNext]);
+    setStepNumber(newHistory.length);
+  }, [current.squares, history, stepNumber, winner, xIsNext]);
 
   return (
     <div className="game">
@@ -84,7 +104,7 @@ const Game: React.FC = () => {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{/* TODO */}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
