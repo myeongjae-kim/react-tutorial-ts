@@ -8,6 +8,10 @@ import { Point } from './Point';
 
 export const boardSize = 3;
 
+export enum HistoryOrder {
+  ASCENDING, DESCENDING
+}
+
 type History = Array<{
   squares: CellValue[][]
   move: Point
@@ -18,6 +22,13 @@ const Game: React.FC = () => {
     squares: Array(boardSize).fill(Array(boardSize).fill(null)),
     move: {row: -1, col: -1}
   }])
+  const [historyOrder, setHistoryOrder] = React.useState(HistoryOrder.ASCENDING);
+  const toggleHistoryOrder = React.useCallback(() => {
+    setHistoryOrder(historyOrder === HistoryOrder.ASCENDING
+      ? HistoryOrder.DESCENDING
+      : HistoryOrder.ASCENDING)
+  }, [historyOrder]);
+
   const [xIsNext, setXIsNext] = React.useState(true);
   const [currentStep, setCurrentStep] = React.useState(0);
 
@@ -75,7 +86,8 @@ const Game: React.FC = () => {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{moves}</ol>
+        <button onClick={toggleHistoryOrder}>Reverse history</button>
+        <ol>{historyOrder === HistoryOrder.ASCENDING ? moves : moves.reverse()}</ol>
       </div>
     </div>
   );
