@@ -4,14 +4,17 @@ import './index.css';
 import { CellValue } from './CellValue';
 import { calculateWinner } from './calculateWinner';
 import Board from './Board';
+import { Point } from './Point';
 
 type History = Array<{
   squares: CellValue[][]
+  move: Point
 }>;
 
 const Game: React.FC = () => {
   const [history, setHistory] = React.useState<History>([{
-    squares: Array(3).fill(Array(3).fill(null))
+    squares: Array(3).fill(Array(3).fill(null)),
+    move: {row: -1, col: -1}
   }])
   const [xIsNext, setXIsNext] = React.useState(true);
   const [stepNumber, setStepNumber] = React.useState(0);
@@ -34,7 +37,10 @@ const Game: React.FC = () => {
       return;
     }
     squares[row][col] = xIsNext ? 'X' : 'O';
-    setHistory(newHistory.concat([{ squares }]))
+    setHistory(newHistory.concat([{
+      squares,
+      move: { row, col }
+    }]))
     setXIsNext(!xIsNext);
     setStepNumber(newHistory.length);
   }, [current.squares, history, stepNumber, winner, xIsNext]);
@@ -44,13 +50,13 @@ const Game: React.FC = () => {
     setXIsNext(step % 2 === 0);
   }, []);
 
-  const moves = history.map((_, move) => {
-    const desc = move ?
-      'Go to move #' + move :
+  const moves = history.map(({move}, step) => {
+    const desc = step ?
+      `Go to move #${step}: (${move.col}, ${move.row})` :
       'Go to game start';
     return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{desc}</button>
+      <li key={step}>
+        <button onClick={() => jumpTo(step)}>{desc}</button>
       </li>
     );
   });
