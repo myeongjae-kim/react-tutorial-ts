@@ -1,21 +1,54 @@
 import { CellValue } from "./CellValue";
 
-export const calculateWinner = (squares: CellValue[]) => {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+const extractDiagonalLines = (squares: CellValue[][]): [CellValue[], CellValue[]] => {
+  const fromLeft: CellValue[] = [];
+  const fromRight: CellValue[] = [];
+
+  for (let i = 0; i < squares.length; i++) {
+    fromLeft.push(squares[i][i]);
+  }
+
+  const maxIndex = squares.length - 1;
+  for (let i = maxIndex; i >= 0; i--) {
+    fromRight.push(squares[i][maxIndex - i]);
+  }
+
+  return [fromLeft, fromRight];
+}
+
+const pivot = (squares: CellValue[][]): CellValue[][] => {
+  const pivoted: CellValue[][] = squares.map(row => row.slice()); // deep copy
+  
+  let temp: CellValue;
+  for (let row = 1; row < pivoted.length; row++) {
+    for (let col = 0; col < row; col++) {
+      temp = pivoted[row][col];
+      pivoted[row][col] = pivoted[col][row];
+      pivoted[col][row] = temp;
     }
   }
-  return null;
+
+  return pivoted;
 }
+
+const areElementAllSame = (squares: CellValue[]): CellValue => squares.reduce((prev, curr) => {
+  if (prev === curr) {
+    return prev;
+  }
+  return null;
+})
+
+const findNonNullValue = (prev: CellValue, curr: CellValue) => prev || curr;
+
+const hasHorizontalLine = (squares: CellValue[][]): CellValue => squares
+  .map(areElementAllSame)
+  .reduce(findNonNullValue)
+
+const hasVerticalLine = (squares: CellValue[][]): CellValue => hasHorizontalLine(pivot(squares));
+const hasDiagonalLine = (squares: CellValue[][]): CellValue => hasHorizontalLine(extractDiagonalLines(squares));
+
+const checkFunctions = [hasHorizontalLine, hasVerticalLine, hasDiagonalLine];
+
+export const calculateWinner = (squares: CellValue[][]): CellValue => checkFunctions
+  .map(check => check(squares))
+  .reduce(findNonNullValue)

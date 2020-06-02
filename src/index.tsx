@@ -6,12 +6,12 @@ import { calculateWinner } from './calculateWinner';
 import Board from './Board';
 
 type History = Array<{
-  squares: CellValue[]
+  squares: CellValue[][]
 }>;
 
 const Game: React.FC = () => {
   const [history, setHistory] = React.useState<History>([{
-    squares: Array(9).fill(null)
+    squares: Array(3).fill(Array(3).fill(null))
   }])
   const [xIsNext, setXIsNext] = React.useState(true);
   const [stepNumber, setStepNumber] = React.useState(0);
@@ -27,13 +27,13 @@ const Game: React.FC = () => {
     }
   }, [winner, xIsNext]);
 
-  const handleClick = React.useCallback((i: number) => {
+  const handleClick = React.useCallback((row: number, col: number) => {
     const newHistory = history.slice(0, stepNumber + 1);
-    const squares = current.squares.slice();
-    if (winner || squares[i]) {
+    const squares = current.squares.map(row => row.slice());
+    if (winner || squares[row][col]) {
       return;
     }
-    squares[i] = xIsNext ? 'X' : 'O';
+    squares[row][col] = xIsNext ? 'X' : 'O';
     setHistory(newHistory.concat([{ squares }]))
     setXIsNext(!xIsNext);
     setStepNumber(newHistory.length);
@@ -60,7 +60,7 @@ const Game: React.FC = () => {
       <div className="game-board">
         <Board
           squares={current.squares}
-          onClick={i => handleClick(i)}
+          onClick={(row, col) => handleClick(row, col)}
         />
       </div>
       <div className="game-info">

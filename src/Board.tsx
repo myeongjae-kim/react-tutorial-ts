@@ -3,34 +3,34 @@ import { CellValue } from './CellValue';
 import Square from './Square';
 
 interface Props{
-  squares: CellValue[],
-  onClick(i: number): void
+  squares: CellValue[][],
+  onClick(row: number, col: number): void
 }
 
 const Board: React.FC<Props> = ({squares, onClick}) => {
-  const renderSquare = React.useCallback((i: number) => 
+  const renderSquare = React.useCallback((row: number, col: number) => 
     <Square
-      value={squares[i]}
-      onClick={() => onClick(i)}
+      value={squares[row][col]}
+      onClick={() => onClick(row, col)}
     />
   , [onClick, squares]);
 
   return (
     <div>
       <div className="board-row">
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
+        {renderSquare(0, 0)}
+        {renderSquare(0, 1)}
+        {renderSquare(0, 2)}
       </div>
       <div className="board-row">
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
+        {renderSquare(1, 0)}
+        {renderSquare(1, 1)}
+        {renderSquare(1, 2)}
       </div>
       <div className="board-row">
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
+        {renderSquare(2, 0)}
+        {renderSquare(2, 1)}
+        {renderSquare(2, 2)}
       </div>
     </div>
   );
