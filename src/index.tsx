@@ -6,6 +6,8 @@ import { calculateWinner } from './calculateWinner';
 import Board from './Board';
 import { Point } from './Point';
 
+export const boardSize = 3;
+
 type History = Array<{
   squares: CellValue[][]
   move: Point
@@ -13,7 +15,7 @@ type History = Array<{
 
 const Game: React.FC = () => {
   const [history, setHistory] = React.useState<History>([{
-    squares: Array(3).fill(Array(3).fill(null)),
+    squares: Array(boardSize).fill(Array(boardSize).fill(null)),
     move: {row: -1, col: -1}
   }])
   const [xIsNext, setXIsNext] = React.useState(true);

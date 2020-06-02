@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { CellValue } from './CellValue';
 import Square from './Square';
+import { boardSize } from '.';
 
 interface Props{
   squares: CellValue[][],
   onClick(row: number, col: number): void
 }
+
+const rangeClosed = (from: number, to: number) => Array(to).fill(null).map((_, i) => i + from)
 
 const Board: React.FC<Props> = ({squares, onClick}) => {
   const renderSquare = React.useCallback((row: number, col: number) => 
@@ -15,23 +18,13 @@ const Board: React.FC<Props> = ({squares, onClick}) => {
     />
   , [onClick, squares]);
 
+  const result = rangeClosed(0, boardSize)
+    .map(row => rangeClosed(0, boardSize)
+      .map(col => renderSquare(row, col)));
+
   return (
     <div>
-      <div className="board-row">
-        {renderSquare(0, 0)}
-        {renderSquare(0, 1)}
-        {renderSquare(0, 2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(1, 0)}
-        {renderSquare(1, 1)}
-        {renderSquare(1, 2)}
-      </div>
-      <div className="board-row">
-        {renderSquare(2, 0)}
-        {renderSquare(2, 1)}
-        {renderSquare(2, 2)}
-      </div>
+      {result.map(row => <div className="board=row">{row}</div>)}
     </div>
   );
 }
