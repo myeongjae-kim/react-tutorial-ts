@@ -38,10 +38,12 @@ const Game: React.FC = () => {
   React.useEffect(() => {
     if (winner.cellValue) {
       setStatus('Winner: ' + winner.cellValue);
+    } else if (history.length - 1 === boardSize ** 2) {
+      setStatus('Draw');
     } else {
       setStatus('Next player: ' + (xIsNext ? 'X' : 'O'))
     }
-  }, [winner, xIsNext]);
+  }, [history.length, winner, xIsNext]);
 
   const handleClick = React.useCallback((row: number, col: number) => {
     const newHistory = history.slice(0, currentStep + 1);
