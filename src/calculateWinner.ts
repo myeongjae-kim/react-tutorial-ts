@@ -38,17 +38,52 @@ const areElementAllSame = (squares: CellValue[]): CellValue => squares.reduce((p
   return null;
 })
 
-const findNonNullValue = (prev: CellValue, curr: CellValue) => prev || curr;
+export enum LineDirection {
+  UNDETERMINED, HORIZONTAL, VERTICAL, DIAGONAL
+}
 
-const hasHorizontalLine = (squares: CellValue[][]): CellValue => squares
+export interface WinnerData {
+  cellValue: CellValue
+  foundIndex: number
+  lineDirection: LineDirection
+}
+
+const findNonNullValueWithIndex = (prev: WinnerData, curr: CellValue, index: number): WinnerData => {
+  if (prev.cellValue != null) {
+    return prev;
+  }
+
+  return {
+    cellValue: curr,
+    foundIndex: curr === null ? -1 : index,
+    lineDirection: LineDirection.UNDETERMINED
+  }
+};
+
+const hasHorizontalLine = (squares: CellValue[][]): WinnerData => squares
   .map(areElementAllSame)
-  .reduce(findNonNullValue)
+  .reduce(findNonNullValueWithIndex, {cellValue: null, foundIndex: -1, lineDirection: LineDirection.UNDETERMINED})
 
-const hasVerticalLine = (squares: CellValue[][]): CellValue => hasHorizontalLine(pivot(squares));
-const hasDiagonalLine = (squares: CellValue[][]): CellValue => hasHorizontalLine(extractDiagonalLines(squares));
+const hasVerticalLine = (squares: CellValue[][]): WinnerData => hasHorizontalLine(pivot(squares));
+const hasDiagonalLine = (squares: CellValue[][]): WinnerData => hasHorizontalLine(extractDiagonalLines(squares));
 
 const checkFunctions = [hasHorizontalLine, hasVerticalLine, hasDiagonalLine];
 
-export const calculateWinner = (squares: CellValue[][]): CellValue => checkFunctions
-  .map(check => check(squares))
-  .reduce(findNonNullValue)
+export const calculateWinner = (squares: CellValue[][]): WinnerData => {
+  const [horizontal, vertical, diagonal] = checkFunctions
+  .map(check => check(squares));
+
+  if (horizontal.cellValue != null) {
+    return {...horizontal, lineDirection: LineDirection.HORIZONTAL}
+  } else if (vertical.cellValue != null) {
+    return {...vertical, lineDirection: LineDirection.VERTICAL}
+  } else if (diagonal.cellValue != null) {
+    return {...diagonal, lineDirection: LineDirection.DIAGONAL}
+  } else {
+    return {
+      cellValue: null,
+      foundIndex: -1,
+      lineDirection: LineDirection.UNDETERMINED
+    }
+  }
+}

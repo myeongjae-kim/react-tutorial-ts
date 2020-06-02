@@ -36,8 +36,8 @@ const Game: React.FC = () => {
   const winner = calculateWinner(current.squares);
   const [status, setStatus] = React.useState<undefined | string>();
   React.useEffect(() => {
-    if (winner) {
-      setStatus('Winner: ' + winner);
+    if (winner.cellValue) {
+      setStatus('Winner: ' + winner.cellValue);
     } else {
       setStatus('Next player: ' + (xIsNext ? 'X' : 'O'))
     }
@@ -46,7 +46,7 @@ const Game: React.FC = () => {
   const handleClick = React.useCallback((row: number, col: number) => {
     const newHistory = history.slice(0, currentStep + 1);
     const squares = current.squares.map(row => row.slice());
-    if (winner || squares[row][col]) {
+    if (winner.cellValue || squares[row][col]) {
       return;
     }
     squares[row][col] = xIsNext ? 'X' : 'O';
@@ -82,6 +82,7 @@ const Game: React.FC = () => {
         <Board
           squares={current.squares}
           onClick={(row, col) => handleClick(row, col)}
+          winner={winner}
         />
       </div>
       <div className="game-info">
